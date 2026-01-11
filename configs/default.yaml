@@ -1,0 +1,80 @@
+# Default configuration for EEG Motor Imagery experiments
+# All experiments should reference a config for reproducibility
+
+experiment:
+  name: "baseline"
+  seed: 42
+  description: "Baseline CSP+LDA classification"
+
+data:
+  subjects: [1, 2, 3, 4, 5, 6, 7, 8, 9]  # 1-9 available
+  classes:
+    0: "left_hand"
+    1: "right_hand"
+    2: "feet"
+    3: "tongue"
+
+preprocessing:
+  # Bandpass filter (mu: 8-12 Hz, beta: 13-30 Hz)
+  l_freq: 8.0
+  h_freq: 30.0
+
+  # Epoching relative to cue onset
+  tmin: 0.5   # Start 0.5s after cue (motor imagery period)
+  tmax: 4.0   # End at 4s (full MI period)
+  baseline: null  # No baseline correction for CSP
+
+  # Resampling (optional, null to keep original 250 Hz)
+  resample_freq: null
+
+  # Artifact rejection
+  reject:
+    eeg: 100.0e-6  # Reject epochs with >100 µV amplitude
+
+features:
+  # Common Spatial Patterns
+  csp:
+    n_components: 6  # Number of CSP components (3 per class pair)
+    reg: "ledoit_wolf"  # Regularization for covariance estimation
+    log: true  # Log-transform CSP features
+
+  # Power Spectral Density (alternative features)
+  psd:
+    fmin: 8.0
+    fmax: 30.0
+    n_fft: 256
+
+model:
+  # Classical ML
+  classical:
+    type: "lda"  # lda, svm, or random_forest
+    svm:
+      kernel: "rbf"
+      C: 1.0
+      gamma: "scale"
+
+  # Deep Learning (EEGNet)
+  eegnet:
+    F1: 8        # Number of temporal filters
+    D: 2         # Depth multiplier
+    F2: 16       # Number of pointwise filters
+    dropout: 0.5
+
+training:
+  # Cross-validation
+  cv_folds: 5
+  stratified: true
+
+  # Deep learning
+  epochs: 100
+  batch_size: 32
+  learning_rate: 0.001
+  early_stopping_patience: 10
+
+evaluation:
+  metrics: ["accuracy", "kappa", "confusion_matrix", "per_class_accuracy"]
+
+output:
+  results_dir: "results"
+  figures_dir: "figures"
+  save_models: true
