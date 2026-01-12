@@ -124,6 +124,3 @@ features:
 2. Lawhern et al. (2018). EEGNet: A Compact CNN for EEG-based BCIs. Journal of Neural Engineering.
 3. Blankertz et al. (2008). The BCI Competition 2003: Progress and perspectives in detection and discrimination of EEG single trials. IEEE TBME.
 
-## License
-
-MIT License - See LICENSE file for details.
